@@ -97,8 +97,34 @@ router.post('/signup', verifyPasswordToken, async (req, res) => {
     let foundEmail = await user.findOne({ email: email });
     let foundNumber = await user.findOne({ number: number });
 
+    let isVerified
+    let foundMobNumber
+    if(foundEmail){
+        isVerified = foundEmail.isVerified
+        foundMobNumber = foundEmail.number
+    } 
+
+    if(foundNumber){
+        isVerified = foundNumber.isVerified
+        foundMobNumber = foundNumber.number
+    }
+
     // Check if user already exists
     if (foundEmail || foundNumber) {
+        if(!isVerified){
+            let generatedOtp = generateOTP();
+            let foundMobNumberCC = "+91" + foundMobNumber;
+            const userOtp = new otp({
+                number: foundMobNumber,
+                otp: generatedOtp
+            });
+            // store otp into databse
+            userOtp.save()
+            sendSMS(`your otp is ${generatedOtp}`, foundMobNumberCC);
+            return res.render("otp", {
+                expressFlash: req.flash('number', foundMobNumber) 
+            })
+        }
         req.flash("error", "User already exist");
         req.flash("name", name);
         req.flash("email", email);
@@ -130,14 +156,13 @@ router.post('/signup', verifyPasswordToken, async (req, res) => {
     }
     let generatedOtp = generateOTP();
     let mobNumber = "+91" + number;
-    sendSMS(`your otp is ${generatedOtp}`, mobNumber);
-
     const userOtp = new otp({
         number,
         otp: generatedOtp
     });
     // store otp into databse
     userOtp.save()
+    sendSMS(`your otp is ${generatedOtp}`, mobNumber);
     
     const userData = new user({
         name,
