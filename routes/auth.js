@@ -26,18 +26,28 @@ router.get('/',(req,res)=>{
     res.render('success')
 })
 
+
+router.get('/category',(req,res)=>{
+    res.render('category')
+})
+
 router.get('/logout',(req,res)=>{
     res.clearCookie("token");
     res.redirect('login')
 })
 
 router.get('/signup', async (req, res)=>{
+    let {formType, category} = req.query;
+    console.log(formType, category);
+    if(!formType){
+        return res.render('category', {formType: 'signup'})
+    }
     const noBucket = createToken({key: process.env.NO_BUCKET}, process.env.BUCKET_SECRET_KEY, '300s')
     const bucketA = createToken({key: process.env.BUCKET_A}, process.env.BUCKET_SECRET_KEY, '300s')
     const bucketB = createToken({key: process.env.BUCKET_B}, process.env.BUCKET_SECRET_KEY, '300s')
     const bucketC = createToken({key: process.env.BUCKET_C}, process.env.BUCKET_SECRET_KEY, '300s')
     res.render('register',{
-        gridOfRandomImages:gridOfRandomImages(),
+        gridOfRandomImages:gridOfRandomImages(category),
         noBucket,
         bucketA,
         bucketB,
@@ -48,12 +58,17 @@ router.get('/signup', async (req, res)=>{
 })
 
 router.get('/login', (req, res)=>{
+    let {formType, category} = req.query;
+    console.log(formType, category);
+    if(!formType){
+        return res.render('category', {formType: 'login'})
+    }
     const noBucket = createToken({key: process.env.NO_BUCKET}, process.env.BUCKET_SECRET_KEY, '300s')
     const bucketA = createToken({key: process.env.BUCKET_A}, process.env.BUCKET_SECRET_KEY, '300s')
     const bucketB = createToken({key: process.env.BUCKET_B}, process.env.BUCKET_SECRET_KEY, '300s')
     const bucketC = createToken({key: process.env.BUCKET_C}, process.env.BUCKET_SECRET_KEY, '300s')
     res.render('login',{
-        gridOfRandomImages:gridOfRandomImages(),
+        gridOfRandomImages:gridOfRandomImages(category),
         noBucket,
         bucketA,
         bucketB,
@@ -87,9 +102,20 @@ router.get('/resetpassword/:token', async (req, res) => {
     })
 })
 
+router.get('registercat', async (req, res) => {
+    res.render('category', {formType: 'signup'})
+})
+
+router.get('logincat', async (req, res) => {
+    res.render('category', {formType: 'login'})
+})
+
+
 
 // Api for Signup
 router.post('/signup', verifyPasswordToken, async (req, res) => {
+
+    let {category, formType} = req.query;
 
     const {name, email, number, password} = req.body;
     // return res.send(password)
@@ -129,7 +155,7 @@ router.post('/signup', verifyPasswordToken, async (req, res) => {
         req.flash("name", name);
         req.flash("email", email);
         req.flash("number", number);
-        return res.redirect('/signup')
+        return res.redirect(`/signup?category=${category}&formType=${formType}`)
     } 
 
     //  Here we validate the user mobile number 
@@ -138,21 +164,21 @@ router.post('/signup', verifyPasswordToken, async (req, res) => {
         req.flash("name", name);
         req.flash("email", email);
         req.flash("number", number);
-        return res.redirect('/signup')
+        return res.redirect(`/signup?category=${category}&formType=${formType}`)
     }
     //  Here we validate the user email 
     if (!validator.isEmail(email) || !name) {
         req.flash("error", "Invalid Credentials");
         req.flash("name", name);
         req.flash("email", email);
-        return res.redirect('/signup')
+        return res.redirect(`/signup?category=${category}&formType=${formType}`)
     }
     // Validating length of the password
     if(!(password.length >= 4)){
         req.flash("error", "Select atleast 4 images");
         req.flash("name", name);
         req.flash("email", email);
-        return res.redirect('/signup')
+        return res.redirect(`/signup?category=${category}&formType=${formType}`)
     }
     let generatedOtp = generateOTP();
     let mobNumber = "+91" + number;
@@ -183,6 +209,9 @@ router.post('/signup', verifyPasswordToken, async (req, res) => {
 // Api for Login
 router.post('/login', verifyPasswordToken, async (req, res) => {
 
+    let {category, formType} = req.query;
+    console.log(category, formType);
+
 
     //  Get value from user 
         const {email, password} = req.body;
@@ -190,7 +219,7 @@ router.post('/login', verifyPasswordToken, async (req, res) => {
         if(!email){
             req.flash("error", "Invalid Credentials")
             req.flash("email", email);
-            return res.redirect('/login')
+            return res.redirect(`/login?category=${category}&formType=${formType}`)
         }
         
         const foundUser = await user.findOne({ email: email });
@@ -198,7 +227,7 @@ router.post('/login', verifyPasswordToken, async (req, res) => {
         if(!foundUser){
             req.flash("error", "You've not been registered yet")
             req.flash("email", email);
-            return res.redirect('/login')
+            return res.redirect(`/login?category=${category}&formType=${formType}`)
         }
 
         if(foundUser.attempt >= 3){
@@ -217,7 +246,7 @@ router.post('/login', verifyPasswordToken, async (req, res) => {
             await user.findOneAndUpdate({ email: email }, {attempt: foundUser.attempt + 1})
             req.flash("error", "Incorrect password!")
             req.flash("email", email);
-            return res.redirect('/login')
+            return res.redirect(`/login?category=${category}&formType=${formType}`)
         }
 
         let number = foundUser.number
@@ -330,6 +359,23 @@ router.post('/verifyotp', async (req, res) => {
     res.cookie('token', userToken, {maxAge: 360000});
     res.redirect('/')
 
+
+})
+
+router.post('/category',(req,res)=>{
+    let {category, formType} = req.body;
+
+    if(formType == 'signup'){
+        return res.redirect(`/signup?category=${category}&formType=${formType}`)
+    }
+
+    if(formType == 'login'){
+        return res.redirect(`/login?category=${category}&formType=${formType}`)
+    }
+
+    if(formType == 'reset'){
+        return res.redirect(`/resetpassword/:token?category=${category}&formType=${formType}`)
+    }
 
 })
 

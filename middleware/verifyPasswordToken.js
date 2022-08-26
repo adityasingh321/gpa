@@ -34,6 +34,7 @@ const verifyPasswordToken = async (req, res, next) => {
         passArray[i] = `${decodedImageToken.key}:_:${decodedBucketToken.key}`
 
     }
+    console.log(passArray);
     req.body.password = passArray
     next();
 }
