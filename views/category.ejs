@@ -16,7 +16,7 @@
 
 <body>
 
-    <div class="container card w-25 mt-5">
+    <div class="container w-25 card1">
         <% if(messages.error) {%>
         <small style="color:red"><%= messages.error %> </small>
         <% } %>
@@ -26,17 +26,16 @@
         <form method="post" action="/category">
 
             <!-- Category Dropdown -->
-            <label for="cars">Category:</label>
+            <label for="cars"><b class="cat">Category:</b></label><br/>
             <select name="category" id="category">
                 <option value="tech">Tech</option>
                 <option value="food">Food</option>
             </select>
             <input type="hidden" name="formType" value="<%= formType %>">
 
-
             <div class="foot">
                 <!-- Submit button -->
-                <button type="submit" class="btn btn-primary btn-block mt-2">Sign in</button>
+                <button type="submit" class="btn btn-primary btn-block mt-2">Submit</button>
             </div>
     </div>
     </form>

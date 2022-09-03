@@ -160,6 +160,8 @@ body {
   /* width: 500px; */
   margin-top: 10%;
   background-color: #eae3d2;
+  background-color: rgb(255, 255, 255);
+
   border-radius: 30px;
   box-shadow: 4px 7px 20px 1px rgba(0, 0, 0, 0.3);
   padding: 15px 40px;
@@ -174,4 +176,20 @@ body {
   margin-top: 8px;
   border-radius: 10px;
   color: white;
+}
+
+#category{margin:20px;
+  height:50px;
+  width:70%;
+  margin-left:15%;
+  text-align:center;
+  font-size: large;
+  font-weight: 500;
+background-color: rgb(255, 253, 247);
+
+}
+
+
+.cat{
+  font-size: larger;
 }

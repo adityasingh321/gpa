@@ -1,6 +1,8 @@
 const gpwd_set = new Set();
 const passArray = [];
 
+document.addEventListener('contextmenu', event => event.preventDefault());
+
 // let selectedBucket = document.getElementById();
 function onSelectImage(res) {
   console.log(res);
@@ -145,3 +147,5 @@ intro.setOptions({
   ]
 })
 intro.start();
+
+
