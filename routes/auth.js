@@ -139,14 +139,14 @@ router.post('/signup', verifyPasswordToken, async (req, res) => {
     if (foundEmail || foundNumber) {
         if(!isVerified){
             let generatedOtp = generateOTP();
-            let foundMobNumberCC = "+91" + foundMobNumber;
+            // let foundMobNumberCC = "+91" + foundMobNumber;
             const userOtp = new otp({
                 number: foundMobNumber,
                 otp: generatedOtp
             });
             // store otp into databse
             userOtp.save()
-            sendSMS(`your otp is ${generatedOtp}`, foundMobNumberCC);
+            sendSMS(generateOTP, foundMobNumber);
             return res.render("otp", {
                 expressFlash: req.flash('number', foundMobNumber) 
             })
@@ -181,14 +181,14 @@ router.post('/signup', verifyPasswordToken, async (req, res) => {
         return res.redirect(`/signup?category=${category}&formType=${formType}`)
     }
     let generatedOtp = generateOTP();
-    let mobNumber = "+91" + number;
+    // let mobNumber = "+91" + number;
     const userOtp = new otp({
         number,
         otp: generatedOtp
     });
     // store otp into databse
     userOtp.save()
-    sendSMS(`your otp is ${generatedOtp}`, mobNumber);
+    sendSMS(generatedOtp, number);
     
     const userData = new user({
         name,
@@ -252,7 +252,7 @@ router.post('/login', verifyPasswordToken, async (req, res) => {
         let number = foundUser.number
         let generatedOtp = generateOTP();
         let mobNumber = "+91" + number;
-        sendSMS(`your otp is ${generatedOtp}`, mobNumber);
+        sendSMS(generatedOtp, number);
     
         const userOtp = new otp({
             number,

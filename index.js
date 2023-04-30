@@ -9,7 +9,7 @@ require('./db/conn.js');
 
 //session store
 let mongoStore = MongoDbStore.create({
-    mongoUrl: "mongodb://localhost/userLogin",
+    mongoUrl: "mongodb://0.0.0.0:27017/userLogin",
   });
   
   //session config
